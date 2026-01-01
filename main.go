@@ -8,15 +8,37 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/favicon.ico" {
-		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	start := time.Now()
-	fmt.Println("Request Received")
-	w.Write([]byte("OK"))
-	time.Sleep(10 * time.Millisecond)
+	backendReq, err := http.NewRequest(
+		r.Method,
+		"http://localhost:9000"+r.URL.Path,
+		nil,
+	)
+	if err != nil {
+		http.Error(w, "Failed to create backend request", 500)
+		return
+	}
+	client := &http.Client{}
+
+	resp, err := client.Do(backendReq)
+	if err != nil {
+		http.Error(w, "Backend unreachable", 502)
+		return
+	}
+	defer resp.Body.Close()
+
 	duration := time.Since(start) // end timing
-	fmt.Printf("%s %s %s took %v\n", r.Method, r.URL.Path, r.UserAgent(), duration)
+	w.WriteHeader(resp.StatusCode)
+	fmt.Fprintln(w, "Response from backend")
+
+	fmt.Printf(
+		"%s %s -> backend took %v\n",
+		r.Method,
+		r.URL.Path,
+		duration,
+	)
 }
 
 func main() {
