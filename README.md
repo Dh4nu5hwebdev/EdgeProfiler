@@ -37,9 +37,14 @@ GET /test took 8ms
 
 v0.1 – Basic request profiling and logging
 
+**v0.2 – Reverse proxy with backend latency profiling.**
+
 ### Planned improvements
 
-- Forward requests to a backend server (proxy mode)
-- Measure backend API latency
-- Improve log formatting
-- Add request identifiers
+- Forward full backend responses (status, body)
+- Support forwarding request bodies (POST/PUT)
+- Copy essential HTTP headers
+- Add structured request logs
+- Introduce request ID tracking
+- Make backend target configurable
+- Improve error handling and timeout
